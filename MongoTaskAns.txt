@@ -1,0 +1,17 @@
+1.
+db.topics.aggregate([{$match: {$expr: { $eq: [{ $month: "$topic_date" }, 10] }}},{$project: {_id: 0,topic: 1}}]);
+
+2.
+db.drives.find({drive_date: {$gte: ISODate("2020-10-15T00:00:00.000Z"), $lte: ISODate("2020-10-31T23:59:59.999Z")}},{_id: 0,"user-id": 1,company_name: 1,drive_date: 1});
+
+3.
+db.company_drives.aggregate([{$lookup:{from:"users",localField:"user-id",foreignField:"user-id",as:"user_details"}},{$project:{_id:0,company_name:1,users:"$user_details.name"}}]);
+
+4.
+db.codekata.aggregate([{$group:{_id:"$user-id",total:{$sum:"$no_of_problems_solved"}}},{$project:{_id:0,user_id:"$_id",total:1}}]);
+
+5.
+db.users.aggregate([{$group:{_id:"$mentor-id",count:{$sum:1}}},{$match:{count:{$gt:15}}},{$lookup:{from:"mentors",localField:"_id",foreignField:"mentor-id",as:"mentor_details"}},{$unwind:"$mentor_details"},{$project:{_id:0,mentor_name:"$mentor_details.mentor_name",count:1}}]);
+
+6.
+db.tasks.aggregate([{$match:{due_date:{$gte:ISODate("2020-10-15T00:00:00.000Z"),$lte:ISODate("2020-10-31T23:59:59.999Z")},submitted:false}},{$group:{_id:"$user-id"}},{$count:"absent_and_not_submitted_users"}]);
